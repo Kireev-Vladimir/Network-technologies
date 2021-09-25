@@ -21,7 +21,7 @@ public class MulticastSender implements Runnable{
             int i = 0;
             while(true) {
                 message = LocalNetworkCopyFinder.processName + " Sent " + i + " times by process";
-                datagramPacket = new DatagramPacket(message.getBytes(), message.length(), LocalNetworkCopyFinder.group, 3456);
+                datagramPacket = new DatagramPacket(message.getBytes(), message.length(), LocalNetworkCopyFinder.group, 34566);
                 mcSocket.send(datagramPacket);
                 Thread.sleep(1000);
                 i++;

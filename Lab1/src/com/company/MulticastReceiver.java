@@ -1,8 +1,7 @@
 package com.company;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.MulticastSocket;
+import java.net.*;
 
 public class MulticastReceiver implements Runnable {
 
@@ -13,8 +12,14 @@ public class MulticastReceiver implements Runnable {
 
 
     MulticastReceiver() throws IOException {
-        mcSocket = new MulticastSocket(3456);
-        mcSocket.joinGroup(LocalNetworkCopyFinder.group);
+
+        InetAddress mcastaddr = InetAddress.getByName("228.5.6.7");
+        InetSocketAddress group = new InetSocketAddress(mcastaddr, 34566);
+        NetworkInterface netIf = NetworkInterface.getByName("bge0");
+
+
+        mcSocket = new MulticastSocket(34566);
+        mcSocket.joinGroup(group, netIf);
         datagramPacket = new DatagramPacket(buffer, buffer.length);
     }
 
@@ -24,6 +29,7 @@ public class MulticastReceiver implements Runnable {
             while (true) {
                 mcSocket.receive(datagramPacket);
                 receivedString = new String(buffer);
+                System.out.println(receivedString);
                 if(!receivedString.split(" ")[0].equals(LocalNetworkCopyFinder.processName)){
                     LocalNetworkCopyFinder.packageReceived(receivedString.split(" ")[0]);
                 }
