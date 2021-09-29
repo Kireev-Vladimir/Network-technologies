@@ -4,24 +4,28 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 public class LocalNetworkCopyFinder extends Thread{
     static InetAddress group;
-    static InetAddress procIp;
-    static String processName;
+    static String sendMessage;
 
     private static Map<String, Long> processes;
 
+    private static void printProcesses(){
+        System.out.println("===========================");
+        for(Map.Entry<String, Long> entry: processes.entrySet())
+            System.out.println(entry.getKey());
+        System.out.println("===========================");
+    }
+
     static void packageReceived(String processName){
         if(!processes.containsKey(processName)){
-            System.out.println("New process: " + processName);
             processes.put(processName, System.currentTimeMillis());
+            printProcesses();
         }
         else {
             processes.replace(processName, System.currentTimeMillis());
@@ -34,8 +38,8 @@ public class LocalNetworkCopyFinder extends Thread{
             Long time = entry.getValue();
             if(curTime - time > 2000){
                 String closedName = entry.getKey();
-                System.out.println(closedName + " closed");
                 processes.remove(closedName);
+                printProcesses();
             }
         }
     }
@@ -43,8 +47,7 @@ public class LocalNetworkCopyFinder extends Thread{
 
 
     LocalNetworkCopyFinder(String ip) throws UnknownHostException {
-        processName = ManagementFactory.getRuntimeMXBean().getName();
-        procIp = InetAddress.getLocalHost();
+        sendMessage = ManagementFactory.getRuntimeMXBean().getName() + " " + InetAddress.getLocalHost().toString();
         group = InetAddress.getByName(ip);
         processes = new ConcurrentHashMap<>();
     }
@@ -53,7 +56,7 @@ public class LocalNetworkCopyFinder extends Thread{
     public void run() {
         try {
             Thread multicastSender = new Thread(new MulticastSender());
-            Thread multicastReceiver = new Thread(new MulticastReceiver());
+            Thread multicastReceiver = new Thread(new MulticastReceiver(group));
 
             multicastReceiver.start();
             multicastSender.start();

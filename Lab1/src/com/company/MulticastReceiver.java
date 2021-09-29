@@ -11,15 +11,10 @@ public class MulticastReceiver implements Runnable {
     String receivedString;
 
 
-    MulticastReceiver() throws IOException {
-
-        InetAddress mcastaddr = InetAddress.getByName("228.5.6.7");
-        InetSocketAddress group = new InetSocketAddress(mcastaddr, 34566);
-        NetworkInterface netIf = NetworkInterface.getByName("bge0");
-
+    MulticastReceiver(InetAddress group) throws IOException {
 
         mcSocket = new MulticastSocket(34566);
-        mcSocket.joinGroup(group, netIf);
+        mcSocket.joinGroup(group);
         datagramPacket = new DatagramPacket(buffer, buffer.length);
     }
 
@@ -28,10 +23,9 @@ public class MulticastReceiver implements Runnable {
         try {
             while (true) {
                 mcSocket.receive(datagramPacket);
-                receivedString = new String(buffer);
-                System.out.println(receivedString);
-                if(!receivedString.split(" ")[0].equals(LocalNetworkCopyFinder.processName)){
-                    LocalNetworkCopyFinder.packageReceived(receivedString.split(" ")[0]);
+                receivedString = new String(buffer, 0, datagramPacket.getLength());
+                if(!receivedString.equals(LocalNetworkCopyFinder.sendMessage)){
+                    LocalNetworkCopyFinder.packageReceived(receivedString);
                 }
             }
         }catch (IOException e) {
