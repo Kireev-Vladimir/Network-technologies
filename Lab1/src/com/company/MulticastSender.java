@@ -20,9 +20,10 @@ public class MulticastSender implements Runnable{
         try {
             int i = 0;
             while(true) {
-                datagramPacket = new DatagramPacket(LocalNetworkCopyFinder.sendMessage.getBytes(), LocalNetworkCopyFinder.sendMessage.length(), LocalNetworkCopyFinder.group, 34566);
+                datagramPacket = new DatagramPacket(LocalNetworkCopyFinder.sendMessage.getBytes(),
+                        LocalNetworkCopyFinder.sendMessage.length(), LocalNetworkCopyFinder.group, LocalNetworkCopyFinder.PORT);
                 mcSocket.send(datagramPacket);
-                Thread.sleep(1000);
+                Thread.sleep(LocalNetworkCopyFinder.SLEEP_TIME);
                 i++;
             }
         } catch (IOException | InterruptedException e) {

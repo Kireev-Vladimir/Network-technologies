@@ -13,7 +13,7 @@ public class MulticastReceiver implements Runnable {
 
     MulticastReceiver(InetAddress group) throws IOException {
 
-        mcSocket = new MulticastSocket(34566);
+        mcSocket = new MulticastSocket(LocalNetworkCopyFinder.PORT);
         mcSocket.joinGroup(group);
         datagramPacket = new DatagramPacket(buffer, buffer.length);
     }

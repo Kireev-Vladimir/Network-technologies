@@ -12,6 +12,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class LocalNetworkCopyFinder extends Thread{
     static InetAddress group;
     static String sendMessage;
+    public static final int SLEEP_TIME = 1000;
+    public static final int WAIT_TIME = 3000;
+    public static final int PORT = 44444;
 
     private static Map<String, Long> processes;
 
@@ -36,7 +39,7 @@ public class LocalNetworkCopyFinder extends Thread{
         Long curTime = System.currentTimeMillis();
         for (Map.Entry<String, Long> entry: processes.entrySet()) {
             Long time = entry.getValue();
-            if(curTime - time > 2000){
+            if(curTime - time > WAIT_TIME){
                 String closedName = entry.getKey();
                 processes.remove(closedName);
                 printProcesses();
@@ -47,8 +50,8 @@ public class LocalNetworkCopyFinder extends Thread{
 
 
     LocalNetworkCopyFinder(String ip) throws UnknownHostException {
-        sendMessage = ManagementFactory.getRuntimeMXBean().getName() + " " + InetAddress.getLocalHost().toString();
         group = InetAddress.getByName(ip);
+        sendMessage = ManagementFactory.getRuntimeMXBean().getName() + " " + InetAddress.getLocalHost().toString();
         processes = new ConcurrentHashMap<>();
     }
 
@@ -68,7 +71,7 @@ public class LocalNetworkCopyFinder extends Thread{
                 public void run() {
                     checkClosedProcesses();
                 }
-            }, 0, 1000);
+            }, 0, SLEEP_TIME);
         } catch (IOException e) {
             e.printStackTrace();
         }
